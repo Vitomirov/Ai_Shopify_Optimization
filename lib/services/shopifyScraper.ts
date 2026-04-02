@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { isShopifyStore } from "../validators/shopifyValidator";
 
 
 const DEFAULT_USER_AGENT =
@@ -181,8 +182,17 @@ export const fetchThemeConfig = async (storeUrl: string): Promise<ThemeConfig> =
 /**
  * Combined scraper for AI
  */
-export const fetchShopifyData = async (storeUrl: string): Promise<ShopifyScrapedData | object> => {
-  if (!storeUrl) return {};
+
+export const fetchShopifyData = async (
+  storeUrl: string
+): Promise<ShopifyScrapedData> => {
+  if (!storeUrl) throw new Error("No URL provided");
+
+  const isShopify = await isShopifyStore(storeUrl);
+
+  if (!isShopify) {
+    throw new Error("Provided URL is not a Shopify store");
+  }
 
   const [seo, css_summary, theme_config] = await Promise.all([
     scrapePublicSEOData(storeUrl),

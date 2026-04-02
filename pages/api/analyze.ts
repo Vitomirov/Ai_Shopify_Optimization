@@ -14,7 +14,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     res.status(200).json({ success: true, scrapedData, recommendations });
   } catch (error: any) {
-    console.error("analyze POST error:", error.stack || error.message);
-    res.status(500).json({ error: "Server error. See console for details." });
+  if (error.message.includes("not a Shopify")) {
+    return res.status(400).json({ error: error.message });
+  }
+  res.status(500).json({ error: "Internal server error" });
   }
 }
